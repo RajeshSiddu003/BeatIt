@@ -7,6 +7,8 @@ const Beat = (props) => {
   const [username, setUsername] = useState("");
   const [editBeat, setEditbeat] = useState(false);
   const [newcontent, setNewcontent] = useState(props.content);
+  const [profilepath, setProfilepath] = useState("");
+
   // console.log(props);
   useEffect(() => {
     axios.get("http://localhost:3001/getuser").then((res) => {
@@ -16,6 +18,18 @@ const Beat = (props) => {
         console.log(res.data.message);
       }
     });
+
+    axios
+      .post("http://localhost:3001/getprofile", {
+        username: props.name,
+      })
+      .then((res) => {
+        if (res.data.status === "pass") {
+          setProfilepath(res.data.profile);
+        } else {
+          console.log("failed to fetch profile/profile not found");
+        }
+      });
   }, []);
 
   function handleDeletebeat() {
@@ -48,7 +62,6 @@ const Beat = (props) => {
         .then((res) => {
           if (res.data.status === "pass") {
             // console.log("beat updated");
-
             setEditbeat(false);
           } else {
             console.log(res.data.message);
@@ -65,7 +78,17 @@ const Beat = (props) => {
     <div className="beat">
       <div className="beat-head">
         <div className="beat-profile-pic">
-          <img src="https://pbs.twimg.com/profile_images/529921298533605376/Axg3L134_400x400.png"></img>
+          {profilepath ? (
+            <img
+              src={`http://localhost:3001/images/` + profilepath}
+              alt="profile pic"
+            ></img>
+          ) : (
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png"
+              alt="profile pic"
+            ></img>
+          )}
         </div>
         <div className="beat-profile-info">
           <div className="name" onClick={handleNavProfile}>

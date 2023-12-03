@@ -48,7 +48,7 @@ const Login = () => {
 
   return (
     <div className="container">
-      <div className="login-container">
+      <div className="login-container login-container-add-margin">
         <div className="login-logo">
           Welcome to <i>Beat it!</i>
         </div>
@@ -71,7 +71,7 @@ const Login = () => {
           <button id="surf" onClick={handleNavhome}>
             Surf Anonymously
           </button>
-          <button id="reg" onClick={handleNavRegis}>
+          <button className="reg" onClick={handleNavRegis}>
             New user? Sign up
           </button>
         </form>

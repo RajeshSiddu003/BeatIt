@@ -4,6 +4,8 @@ import cookieparser from "cookie-parser";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import multer from "multer";
+import path from "path";
 const saltRounds = 10;
 // importing packages
 
@@ -17,6 +19,21 @@ app.use(
     credentials: true,
   })
 );
+app.use(express.static(`public`));
+
+//const upload = multer({ storage: multer.memoryStorage() });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/images");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+const upload = multer({ storage: storage });
 // middlewares
 
 const db = mysql.createConnection({
@@ -50,6 +67,22 @@ app.get("/getuser", isUserexists, (req, res) => {
     status: "pass",
     message: "valid token exists",
     name: req.name,
+  });
+});
+
+app.post("/getprofile", (req, res) => {
+  const sqlQuery = "SELECT * FROM beatit.users WHERE username = ?";
+  db.query(sqlQuery, [req.body.username], (err, result) => {
+    if (err) {
+      res.json({ status: "fail", message: "sql error" });
+    }
+    if (result.length > 0) {
+      res.json({
+        status: "pass",
+        message: "fetched profile success",
+        profile: result[0].profile,
+      });
+    }
   });
 });
 
@@ -186,17 +219,31 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.post("/register", (req, res) => {
+app.post("/userexists", (req, res) => {
+  const sqlQuery = "SELECT * FROM beatit.users WHERE username = ?";
+  db.query(sqlQuery, [req.body.username], (err, result) => {
+    if (err) {
+      res.json({ status: "fail", message: "sql error" });
+    }
+    if (result.length > 0) {
+      res.json({ status: "pass", message: "user exists" });
+    }
+  });
+});
+
+app.post("/register", upload.single("picture"), (req, res) => {
+  let picture = req.file ? req.file.filename : "";
+  // console.log(picture);
   const password = req.body.pass;
   bcrypt.hash(password, saltRounds, (err, hash) => {
     if (err) {
       console.log(err);
     } else {
       const sqlQuery =
-        "INSERT INTO beatit.users (username, email, password) VALUES (?,?,?)";
+        "INSERT INTO beatit.users (username, email, password, profile) VALUES (?,?,?,?)";
       db.query(
         sqlQuery,
-        [req.body.user, req.body.email, hash],
+        [req.body.user, req.body.email, hash, picture],
         (err, result) => {
           if (err) {
             res.json({ status: "fail", message: "user already exists" });
@@ -208,6 +255,8 @@ app.post("/register", (req, res) => {
     }
   });
 });
+
+// app.post()
 
 app.get("/logout", (req, res) => {
   res.clearCookie("token");

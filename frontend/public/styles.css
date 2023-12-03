@@ -169,6 +169,10 @@
   padding: 10px;
 }
 
+.profile-nav .editprof {
+  background-color: rgb(180, 112, 244);
+}
+
 .profile-nav button:hover {
   text-decoration: underline;
 }
@@ -177,7 +181,11 @@
   /* background-color: red; */
   width: 60%;
   margin-left: 20%;
-  margin-top: 80px;
+  margin-top: 100px;
+}
+
+.login-container-add-margin {
+  margin-top: 150px;
 }
 
 .login-logo {
@@ -213,13 +221,13 @@
   background-color: rgb(74, 234, 255);
   border-radius: 5px;
   border: 2px solid black;
-  
+
   padding: 5px;
   width: 70%;
   margin-left: 15%;
 }
 
-#reg {
+.login-container .reg {
   background: none;
   border: 2px solid black;
 }

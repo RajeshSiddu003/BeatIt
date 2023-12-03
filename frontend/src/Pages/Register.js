@@ -7,6 +7,7 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [errmessage, setErrmessage] = useState("");
+  const [picture, setPicture] = useState("");
 
   const navigate = useNavigate();
   axios.defaults.withCredentials = true;
@@ -23,12 +24,19 @@ const Register = () => {
           setErrmessage("Please fill password");
         }
       }
+    } else if (pass.length < 6) {
+      setErrmessage("Password must be min of 6 characters");
     } else {
+      const formData = new FormData();
+      formData.append("user", name);
+      formData.append("email", email);
+      formData.append("pass", pass);
+      formData.append("picture", picture);
       axios
-        .post("http://localhost:3001/register", {
-          user: name,
-          email: email,
-          pass: pass,
+        .post("http://localhost:3001/register", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         })
         .then((res) => {
           if (res.data.status === "pass") {
@@ -73,6 +81,11 @@ const Register = () => {
               type="password"
               placeholder="Password"
               onChange={(e) => setPass(e.target.value)}
+            ></input>
+            <label>👇Choose profile picture</label>
+            <input
+              type="file"
+              onChange={(e) => setPicture(e.target.files[0])}
             ></input>
             <button type="submit" onClick={handleRegister}>
               Register
